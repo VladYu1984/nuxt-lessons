@@ -1,0 +1,56 @@
+@use 'variables' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: $font-body;
+  background-color: $color-bg;
+  color: $color-text;
+  line-height: 1.6;
+}
+
+h1 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h1; margin-bottom: $spacing-md; line-height: 1.2; }
+h2 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h2; margin-bottom: $spacing-md; line-height: 1.2; }
+h3 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h3; margin-bottom: $spacing-md; line-height: 1.2; }
+h4 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h4; margin-bottom: $spacing-md; line-height: 1.2; }
+h5 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h5; margin-bottom: $spacing-md; line-height: 1.2; }
+h6 { font-family: $font-heading; font-weight: 700; font-size: $font-size-h6; margin-bottom: $spacing-md; line-height: 1.2; }
+
+p, li, span, a {
+  font-family: $font-body;
+  font-weight: 400;
+  margin-bottom: $spacing-md;
+  line-height: 1.6;
+}
+
+a {
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+ul, ol {
+  margin-bottom: $spacing-md;
+  padding-left: 2rem;
+
+  li {
+    margin-bottom: $spacing-xs;
+  }
+}
+
+ul {
+  list-style: none;
+}
