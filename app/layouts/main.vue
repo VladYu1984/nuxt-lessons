@@ -1,30 +1,47 @@
+<script setup lang="ts">
+import Footer from '~/components/widgets/Footer.vue';
+import Header from '~/components/widgets/Header.vue';
+</script>
+
 <template>
-  <div class="main-layout">
-    <header class="main-header">
-      <nav>
-        <h1>Lessons App</h1>
-      </nav>
-    </header>
+	<div class="main-layout">
+		<Header />
 
-    <main>
-      <slot />
-    </main>
+		<main class="main-layout__content">
+			<div class="container">
+				<slot />
+			</div>
+		</main>
 
-    <footer class="main-footer">
-      <p>&copy; 2025 Lessons App</p>
-    </footer>
-  </div>
+		<Footer />
+	</div>
 </template>
 
 <style lang="scss" scoped>
-    .main-header, .main-footer {
-        background-color: #333;
-        color: #fff;
-        padding: 1rem 2rem;
-    }
+@use '~/assets/scss/variables' as *;
 
-    main {
-        padding: 2rem;
-        min-height: calc(100vh - 140px);
-    }
+.main-layout {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	background: $color-bg;
+
+	&__content {
+		flex: 1;
+		padding: $spacing-lg;
+		min-height: calc(100vh - 140px);
+	}
+
+	.container {
+		max-width: 1200px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	@media (min-width: 768px) {
+		&__content {
+		padding: $spacing-xl;
+		}
+	}
+}
 </style>
