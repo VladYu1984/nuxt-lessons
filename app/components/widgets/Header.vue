@@ -1,4 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Button from '../shared/ui/Button.vue';
+
+const auth = useAuthStore();
+const userStore = useUserStore();
+const isLoggedIn = computed(() => !!userStore.user);
+
+async function onLogout() {
+  await auth.logout();
+  navigateTo('/');
+}
+</script>
 
 <template>
     <header class="main-header">
@@ -9,10 +20,19 @@
 					width="40"
 					height="40"
 					alt="Lessons App logo"
-					class="main-header__logo"
 				/>
-				<h1 class="main-header__title">Lessons App</h1>
+				<h4 class="main-header__title">Lessons App</h4>
             </div>
+			<div class="main-header__actions">
+				<Button
+					v-if="isLoggedIn"
+					class="main-header__logout-button"
+					:disabled="auth.isLoading"
+					@click="onLogout"
+				>
+					Logout
+				</Button>
+			</div>
         </nav>
     </header>
 </template>
@@ -41,16 +61,7 @@
 		gap: 0.75rem;
     }
 
-	&__logo {
-		display: block;
-		width: 40px;
-		height: 40px;
-		object-fit: contain;
-	}
-
 	&__title {
-		font-size: 1.25rem;
-		font-weight: 600;
 		color: $color-white;
 	}
 }

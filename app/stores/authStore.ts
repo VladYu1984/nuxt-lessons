@@ -4,11 +4,18 @@ import { useApi } from '~/composables/useApi';
 
 export type UserRole = 'USER' | 'TEACHER';
 
-export interface User {
+interface User {
     id: number;
     name: string;
     email: string;
     role: UserRole;
+    profile: Profile;
+}
+
+interface Profile {
+    id: string;
+    about: string;
+    avatarUrl: string;
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -63,8 +70,24 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    function logout() {
-        user.value = null;
+    async function logout() {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            await api.request('/auth/logout', { method: 'POST' });
+        } catch (err: any) {
+            console.error('Logout request failed', err);
+        } finally {
+            user.value = null;
+            try {
+                const userStore = useUserStore();
+                userStore.user = null;
+            } catch (err: any) {
+                // log err
+            }
+            isLoading.value = false;
+        }
     }
 
     function setRole(newRole: UserRole) {

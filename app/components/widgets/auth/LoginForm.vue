@@ -7,21 +7,20 @@ import Button from '~/components/shared/ui/Button.vue';
 const authStore = useAuthStore();
 
 const form = reactive({
-  email: '',
-  password: '',
+    email: '',
+    password: '',
 });
 
 async function onSubmit() {
-  try {
-    await authStore.login({
-      email: form.email,
-      password: form.password,
-    });
-    navigateTo('/')
-    console.log('User logged in:', authStore.user);
-  } catch (err) {
-    console.error('Login error', err);
-  }
+    try {
+        await authStore.login({
+            email: form.email,
+            password: form.password,
+        });
+        navigateTo('/profile')
+    } catch (err) {
+        console.error('Login error', err);
+    }
 }
 </script>
 
