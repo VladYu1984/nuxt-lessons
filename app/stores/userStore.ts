@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
-import type { User } from '~/shared/types/user';
+import type { Profile, User } from '~/shared/types/user';
 
 export const useUserStore = defineStore('user', () => {
     const api = useApi();
@@ -43,18 +43,22 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    async function updateProfile(payload: Partial<User>) {
+    async function updateProfile(
+        payload: Partial<User> & { profile?: Partial<Profile> },
+    ) {
         isLoading.value = true;
         error.value = null;
 
         try {
-            const res = await api.request<User>('/user/me', {
-                method: 'PUT',
+            const res = await api.request<User>('/profile', {
+                method: 'PATCH',
                 body: payload,
             });
 
             user.value = res;
             return res;
+        } catch (err: unknown) {
+            console.error('Update profile failed', err);
         } finally {
             isLoading.value = false;
         }
@@ -62,7 +66,6 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         user,
-        useRequestHeader,
         role,
         isLoaded,
         isLoading,

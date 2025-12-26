@@ -41,27 +41,54 @@ async function onSubmit() {
 </script>
 
 <template>
-  <form class="register-form" @submit.prevent="onSubmit">
-        <Input v-model="form.name" label="Name" placeholder="Your name" required />
-        <Input v-model="form.email" label="Email" type="email" placeholder="you@example.com" required />
-        <Input v-model="form.password" label="Password" type="password" placeholder="Password" required />
+    <form class="register-form" @submit.prevent="onSubmit">
+        <Input
+            v-model="form.name"
+            label="Name"
+            placeholder="Your name"
+            required
+        />
+        <Input
+            v-model="form.email"
+            label="Email"
+            type="email"
+            placeholder="you@example.com"
+            required
+        />
+        <Input
+            v-model="form.password"
+            label="Password"
+            type="password"
+            placeholder="Password"
+            required
+        />
 
         <label class="role-toggle">
-        <div class="role-toggle__track" :class="{ teacher: isTeacher }" @click="toggleRole">
             <div
-                class="role-toggle__thumb"
+                class="role-toggle__track"
                 :class="{ teacher: isTeacher }"
-            />
-            <div class="role-toggle__labels">
-                <span>USER</span>
-                <span>TEACHER</span>
+                @click="toggleRole"
+            >
+                <div
+                    class="role-toggle__thumb"
+                    :class="{ teacher: isTeacher }"
+                />
+                <div class="role-toggle__labels">
+                    <span>USER</span>
+                    <span>TEACHER</span>
+                </div>
             </div>
-        </div>
         </label>
 
-        <p v-if="authStore.error" class="register-form__error">{{ authStore.error }}</p>
+        <p v-if="authStore.error" class="register-form__error">
+            {{ authStore.error }}
+        </p>
 
-        <Button type="submit" :loading="authStore.isLoading" class="register-form__button">
+        <Button
+            type="submit"
+            :loading="authStore.isLoading"
+            class="register-form__button"
+        >
             Register
         </Button>
     </form>
@@ -75,23 +102,23 @@ async function onSubmit() {
     padding: 2rem;
     background: $color-white;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 
     &__error {
-            color: $color-error;
-            font-size: 0.875rem;
-            text-align: center;
-        }
+        color: $color-error;
+        font-size: 0.875rem;
+        text-align: center;
     }
+}
 
-    .role-toggle {
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
-        user-select: none;
+.role-toggle {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    user-select: none;
 
     &__track {
         position: relative;
@@ -119,7 +146,7 @@ async function onSubmit() {
         height: 34px;
         background-color: $color-white;
         border-radius: 9999px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         transition: transform 0.3s;
         will-change: transform;
         border: 0.5px solid black;
