@@ -1,21 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
-import type { UserRole } from '~/stores/authStore';
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: UserRole;
-    profile: Profile;
-}
-
-interface Profile {
-    id: string;
-    about: string;
-    avatarUrl: string;
-}
+import type { User } from '~/shared/types/user';
 
 export const useUserStore = defineStore('user', () => {
     const api = useApi();

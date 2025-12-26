@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue';
-import type { UserRole } from '~/stores/authStore';
+import type { UserRole } from '~/shared/types/user';
 import { useAuthStore } from '~/stores/authStore';
 import Input from '~/components/shared/ui/Input.vue';
 import Button from '~/components/shared/ui/Button.vue';
@@ -27,10 +27,10 @@ function toggleRole() {
 async function onSubmit() {
     try {
         await authStore.register({
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: role.value,
+            name: form.name,
+            email: form.email,
+            password: form.password,
+            role: role.value,
         });
         navigateTo('/profile');
         console.log('User registered:', authStore.user);

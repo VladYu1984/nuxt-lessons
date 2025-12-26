@@ -1,22 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
-
-export type UserRole = 'USER' | 'TEACHER';
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: UserRole;
-    profile: Profile;
-}
-
-interface Profile {
-    id: string;
-    about: string;
-    avatarUrl: string;
-}
+import type { User, UserRole } from '~/shared/types/user';
 
 export const useAuthStore = defineStore('auth', () => {
     const api = useApi();
@@ -84,7 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
                 const userStore = useUserStore();
                 userStore.user = null;
             } catch (err: any) {
-                // log err
+                console.error('Logout request failed', err);
             }
             isLoading.value = false;
         }

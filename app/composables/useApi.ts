@@ -1,4 +1,4 @@
-import type { ApiOptions } from '~/shared/types';
+import type { ApiOptions } from '~/shared/types/api';
 
 export function useApi() {
     const config = useRuntimeConfig();
