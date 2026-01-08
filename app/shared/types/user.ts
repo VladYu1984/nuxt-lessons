@@ -10,6 +10,6 @@ export interface User {
 
 export interface Profile {
     id: string;
-    about: string;
-    avatarUrl: string;
+    about?: string;
+    avatarUrl?: string;
 }

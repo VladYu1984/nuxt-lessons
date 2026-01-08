@@ -43,20 +43,18 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    async function updateProfile(
-        payload: Partial<User> & { profile?: Partial<Profile> },
-    ) {
+    async function updateProfile(payload: Partial<Profile>) {
         isLoading.value = true;
         error.value = null;
 
         try {
-            const res = await api.request<User>('/profile', {
+            const updatedUser = await api.request<User>('/profile', {
                 method: 'PATCH',
                 body: payload,
             });
 
-            user.value = res;
-            return res;
+            user.value = updatedUser;
+            return updatedUser;
         } catch (err: unknown) {
             console.error('Update profile failed', err);
         } finally {

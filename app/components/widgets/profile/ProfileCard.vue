@@ -2,23 +2,32 @@
 import { ref, computed } from 'vue';
 import { useUserStore } from '~/stores/userStore';
 import { useApi } from '~/composables/useApi';
+import Button from '~/components/shared/ui/Button.vue';
 
 const userStore = useUserStore();
-const user = computed(() => userStore.user);
-
 const { request } = useApi();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 
-const emit = defineEmits<{ (e: 'edit'): void }>();
+const isEditing = ref(false);
+const about = ref('');
+const saving = ref(false);
 
-function onEdit() {
-    emit('edit');
-}
+const user = computed(() => userStore.user);
 
 function onAvatarClick() {
     fileInput.value?.click();
+}
+
+function startEditing() {
+    about.value = userStore.user?.profile?.about || '';
+    isEditing.value = true;
+}
+
+function cancelEditing() {
+    isEditing.value = false;
+    about.value = '';
 }
 
 async function onFileChange(event: Event) {
@@ -32,11 +41,7 @@ async function onFileChange(event: Event) {
     try {
         uploading.value = true;
 
-        interface UpdateAvatarResponse {
-            avatarUrl: string;
-        }
-
-        const res = await request<UpdateAvatarResponse>('profile/avatar', {
+        const res = await request<{ avatarUrl: string }>('profile/avatar', {
             method: 'PATCH',
             body: formData as any,
         });
@@ -50,10 +55,55 @@ async function onFileChange(event: Event) {
         uploading.value = false;
     }
 }
+
+async function saveProfile() {
+    if (!about.value.trim()) return;
+
+    try {
+        saving.value = true;
+
+        const updatedUser = await userStore.updateProfile({ about: about.value });
+
+        if (updatedUser?.profile) {
+            about.value = updatedUser.profile.about ?? '';
+        }
+
+        isEditing.value = false;
+    } catch (err) {
+        console.error('Failed to update profile', err);
+    } finally {
+        saving.value = false;
+    }
+}
+
+onMounted(() => {
+    if (!userStore.user) userStore.fetchProfile();
+});
 </script>
 
 <template>
-    <div v-if="user" class="profile-card">
+    <div class="profile-card__actions">
+        <Button v-if="!isEditing" @click="startEditing">
+            Edit Profile
+        </Button>
+
+        <template v-else>
+            <Button
+                :disabled="saving"
+                @click="saveProfile"
+            >
+                Save
+            </Button>
+            <Button
+                variant="secondary"
+                @click="cancelEditing"
+            >
+                Cancel
+            </Button>
+        </template>
+    </div>
+
+    <div v-if="!isEditing && user" class="profile-card">
         <div class="profile-card__head">
             <div class="profile-card__avatar-wrapper" @click="onAvatarClick">
                 <NuxtImg
@@ -79,44 +129,58 @@ async function onFileChange(event: Event) {
                 accept="image/*"
                 class="profile-card__file-input"
                 @change="onFileChange"
-            />
+            >
 
             <div class="profile-card__meta">
-                <h3 class="profile-card__name">{{ user.name }}</h3>
-                <p class="profile-card__email">{{ user.email }}</p>
+                <div>
+                    <h3>Name:</h3>
+                    <p class="profile-card__text">{{ user.name }}</p>
+                </div>
+                <div>
+                    <h3>Email:</h3>
+                    <p class="profile-card__text">{{ user.email }}</p>
+                </div>
+                <div>
+                    <h3>About me</h3>
+                    <p class="profile-card__text">{{ user.profile?.about }}</p>
+                </div>
+                <div>
+                    <h3>Role:</h3>
+                    <p class="profile-card__role">{{ user.role }}</p>
+                </div>
             </div>
         </div>
-
-        <p class="profile-card__role"><strong>Role:</strong> {{ user.role }}</p>
-
-        <div class="profile-card__actions">
-            <button class="btn" :disabled="uploading" @click="onEdit">
-                {{ uploading ? 'Uploading...' : 'Edit' }}
-            </button>
-        </div>
     </div>
+    <div v-else class="profile-card profile-card--edit">
+        <h2 class="profile-card__edit-title">
+            Tell us about yourself
+        </h2>
 
-    <div v-else class="profile-card profile-card--empty">
-        <p>No profile available</p>
+        <textarea
+            v-model="about"
+            class="profile-card__textarea"
+            rows="5"
+            placeholder="Write something about yourself"
+        />
     </div>
 </template>
 
 <style lang="scss" scoped>
 .profile-card {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &__actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
 
     &__head {
         display: flex;
-        align-items: center;
-        gap: 1rem;
+        gap: 1.5rem;
+        padding: 1.5rem;
     }
 
     &__avatar-wrapper {
@@ -131,35 +195,23 @@ async function onFileChange(event: Event) {
         height: 64px;
         border-radius: 50%;
         object-fit: cover;
-        background-color: #d1d5db;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.25rem;
-        color: #fff;
 
         &--placeholder {
-            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: 600;
+            font-size: 1.25rem;
         }
     }
 
     &__avatar-spinner {
         position: absolute;
         inset: 0;
-        border: 3px solid rgba(255, 255, 255, 0.6);
-        border-top: 3px solid #3490dc;
+        background: rgba(255, 255, 255, 0.7);
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
     }
 
     &__file-input {
@@ -169,49 +221,58 @@ async function onFileChange(event: Event) {
     &__meta {
         display: flex;
         flex-direction: column;
+        gap: 1.25rem;
+        flex: 1;
+    }
 
-        & > .profile-card__name {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
+    h3 {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
 
-        & > .profile-card__email {
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
+    &__text {
+        font-size: 0.875rem;
+        color: #111827;
     }
 
     &__role {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #1f2937;
+        background-color: #e5e7eb;
+        border-radius: 9999px;
+        width: fit-content;
+    }
+
+    &--edit {
+        padding: 1.5rem;
+    }
+
+    &__edit-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    &__textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 0.75rem;
         font-size: 0.875rem;
-        color: #374151;
-    }
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        resize: vertical;
 
-    &__actions {
-        margin-top: 1rem;
-
-        .btn {
-            background-color: #3490dc;
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-
-            &:hover {
-                background-color: #2779bd;
-            }
-
-            &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-            }
+        &:focus {
+            outline: none;
+            border-color: #6366f1;
         }
-    }
-
-    &--empty {
-        text-align: center;
-        color: #6b7280;
     }
 }
 </style>
