@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useLessonStore } from '~/stores/lessonStore';
 
+definePageMeta({ middleware: 'check-role' });
+
 const lessonStore = useLessonStore();
 
 onMounted(() => {

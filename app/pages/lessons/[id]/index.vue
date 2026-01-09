@@ -1,4 +1,5 @@
 <script setup lang="ts">
+definePageMeta({ middleware: 'check-role' });
 const route = useRoute();
 const lessonStore = useLessonStore();
 

@@ -5,7 +5,8 @@
         <h1>Lessons Page</h1>
         <div :class="$style.lessonsSettings">
             <NuxtLink href="/lessons/create">Create Lesson</NuxtLink>
-            <NuxtLink href="/lessons/myLessons">All my lessons Lesson</NuxtLink>
+            <NuxtLink href="/lessons/teacherLessons">Teacher Lessons</NuxtLink>
+            <NuxtLink href="/lessons/studentLessons">Students Lessons</NuxtLink>
         </div>
     </div>
 </template>
