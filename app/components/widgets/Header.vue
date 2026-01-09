@@ -114,5 +114,4 @@ async function onLogout() {
         }
     }
 }
-
 </style>

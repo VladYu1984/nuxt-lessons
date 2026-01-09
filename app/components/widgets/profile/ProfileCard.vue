@@ -21,7 +21,7 @@ const meta = computed(() => [
     { label: 'Email', value: user.value?.email },
     { label: 'About me', value: user.value?.profile?.about },
     { label: 'Role', value: user.value?.role },
-])
+]);
 
 function onAvatarClick() {
     fileInput.value?.click();
@@ -69,7 +69,9 @@ async function saveProfile() {
     try {
         saving.value = true;
 
-        const updatedUser = await userStore.updateProfile({ about: about.value });
+        const updatedUser = await userStore.updateProfile({
+            about: about.value,
+        });
 
         if (updatedUser?.profile) {
             about.value = updatedUser.profile.about ?? '';
@@ -90,23 +92,11 @@ onMounted(() => {
 
 <template>
     <div :class="$style.actions">
-        <Button v-if="!isEditing" @click="startEditing">
-            Edit Profile
-        </Button>
+        <Button v-if="!isEditing" @click="startEditing"> Edit Profile </Button>
 
         <template v-else>
-            <Button
-                :disabled="saving"
-                @click="saveProfile"
-            >
-                Save
-            </Button>
-            <Button
-                variant="secondary"
-                @click="cancelEditing"
-            >
-                Cancel
-            </Button>
+            <Button :disabled="saving" @click="saveProfile"> Save </Button>
+            <Button variant="secondary" @click="cancelEditing"> Cancel </Button>
         </template>
     </div>
 
@@ -121,14 +111,11 @@ onMounted(() => {
                         height="64"
                         alt="User avatar"
                     />
-                    <div
-                        v-else
-                        :class="$style.avatarPlaceholder"
-                    >
+                    <div v-else :class="$style.avatarPlaceholder">
                         {{ user.name.charAt(0).toUpperCase() }}
                     </div>
                 </div>
-                <div v-else :class="$style.avatarLoading"/>
+                <div v-else :class="$style.avatarLoading" />
             </div>
 
             <input
@@ -137,20 +124,18 @@ onMounted(() => {
                 accept="image/*"
                 :class="$style.fileInput"
                 @change="onFileChange"
-            >
+            />
 
             <ul :class="$style.meta">
                 <li v-for="bio in meta" :key="bio.label">
                     <h3>{{ bio.label }}:</h3>
-                    <p >{{ bio.value }}</p>
+                    <p>{{ bio.value }}</p>
                 </li>
             </ul>
         </div>
     </div>
-    <div v-else >
-        <h2 >
-            Tell us about yourself
-        </h2>
+    <div v-else>
+        <h2>Tell us about yourself</h2>
 
         <textarea
             v-model="about"
@@ -206,33 +191,33 @@ onMounted(() => {
 }
 
 .avatarLoading {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 0.5px solid rgba(0, 0, 0, 0.1);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::after {
-    content: "";
-    width: 24px;
-    height: 24px;
-    border: 3px solid #ccc;
-    border-top-color: #007bff;
+    position: absolute;
+    inset: 0;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::after {
+        content: '';
+        width: 24px;
+        height: 24px;
+        border: 3px solid #ccc;
+        border-top-color: #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .avatar {
@@ -254,4 +239,3 @@ onMounted(() => {
     }
 }
 </style>
-

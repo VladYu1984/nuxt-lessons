@@ -1,15 +1,8 @@
-<script setup lang="ts">
-const lessonStore = useLessonStore();
-
-onMounted(async () => {
-    await lessonStore.getLessons();
-});
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <div>
         <h1>Lessons Page</h1>
-        <pre>{{ lessonStore.lessons }}</pre>
         <div :class="$style.lessonsSettings">
             <NuxtLink href="/lessons/create">Create Lesson</NuxtLink>
             <NuxtLink href="/lessons/myLessons">All my lessons Lesson</NuxtLink>

@@ -30,11 +30,16 @@ export const useLessonStore = defineStore('lesson', () => {
         }
     }
 
+    function getLessonById(id: string) {
+        return lessons.value.find((lesson) => lesson.id === id);
+    }
+
     return {
         lessons,
         isLoading,
         error,
         lessonCount,
         getLessons,
+        getLessonById,
     };
 });
