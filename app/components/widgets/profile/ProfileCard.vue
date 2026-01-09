@@ -16,6 +16,13 @@ const saving = ref(false);
 
 const user = computed(() => userStore.user);
 
+const meta = computed(() => [
+    { label: 'Name', value: user.value?.name },
+    { label: 'Email', value: user.value?.email },
+    { label: 'About me', value: user.value?.profile?.about },
+    { label: 'Role', value: user.value?.role },
+])
+
 function onAvatarClick() {
     fileInput.value?.click();
 }
@@ -82,7 +89,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="profile-card__actions">
+    <div :class="$style.actions">
         <Button v-if="!isEditing" @click="startEditing">
             Edit Profile
         </Button>
@@ -103,176 +110,148 @@ onMounted(() => {
         </template>
     </div>
 
-    <div v-if="!isEditing && user" class="profile-card">
-        <div class="profile-card__head">
-            <div class="profile-card__avatar-wrapper" @click="onAvatarClick">
-                <NuxtImg
-                    v-if="user.profile?.avatarUrl"
-                    :src="user.profile.avatarUrl"
-                    width="64"
-                    height="64"
-                    alt="User avatar"
-                    class="profile-card__avatar"
-                />
-                <div
-                    v-else
-                    class="profile-card__avatar profile-card__avatar--placeholder"
-                >
-                    {{ user.name.charAt(0).toUpperCase() }}
+    <div v-if="!isEditing && user" :class="$style.card">
+        <div :class="$style.head">
+            <div :class="$style.avatarWrapper" @click="onAvatarClick">
+                <div v-if="!uploading" :class="$style.avatar">
+                    <NuxtImg
+                        v-if="user.profile?.avatarUrl"
+                        :src="user.profile.avatarUrl"
+                        width="64"
+                        height="64"
+                        alt="User avatar"
+                    />
+                    <div
+                        v-else
+                        :class="$style.avatarPlaceholder"
+                    >
+                        {{ user.name.charAt(0).toUpperCase() }}
+                    </div>
                 </div>
-                <div v-if="uploading" class="profile-card__avatar-spinner" />
+                <div v-else :class="$style.avatarLoading"/>
             </div>
 
             <input
                 ref="fileInput"
                 type="file"
                 accept="image/*"
-                class="profile-card__file-input"
+                :class="$style.fileInput"
                 @change="onFileChange"
             >
 
-            <div class="profile-card__meta">
-                <div>
-                    <h3>Name:</h3>
-                    <p class="profile-card__text">{{ user.name }}</p>
-                </div>
-                <div>
-                    <h3>Email:</h3>
-                    <p class="profile-card__text">{{ user.email }}</p>
-                </div>
-                <div>
-                    <h3>About me</h3>
-                    <p class="profile-card__text">{{ user.profile?.about }}</p>
-                </div>
-                <div>
-                    <h3>Role:</h3>
-                    <p class="profile-card__role">{{ user.role }}</p>
-                </div>
-            </div>
+            <ul :class="$style.meta">
+                <li v-for="bio in meta" :key="bio.label">
+                    <h3>{{ bio.label }}:</h3>
+                    <p >{{ bio.value }}</p>
+                </li>
+            </ul>
         </div>
     </div>
-    <div v-else class="profile-card profile-card--edit">
-        <h2 class="profile-card__edit-title">
+    <div v-else >
+        <h2 >
             Tell us about yourself
         </h2>
 
         <textarea
             v-model="about"
-            class="profile-card__textarea"
+            :class="$style.textarea"
             rows="5"
             placeholder="Write something about yourself"
         />
     </div>
 </template>
 
-<style lang="scss" scoped>
-.profile-card {
+<style module lang="scss">
+@use '~/assets/scss/variables' as *;
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.card {
     background-color: #ffffff;
     border-radius: 0.75rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
 
-    &__actions {
-        display: flex;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-    }
+.head {
+    display: flex;
+    gap: 1.5rem;
+}
 
-    &__head {
-        display: flex;
-        gap: 1.5rem;
-        padding: 1.5rem;
-    }
+.avatarWrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+}
 
-    &__avatar-wrapper {
-        position: relative;
-        width: 64px;
-        height: 64px;
-        cursor: pointer;
-    }
+.avatarPlaceholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #374151;
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    &__avatar {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        object-fit: cover;
+.fileInput {
+    display: none;
+}
 
-        &--placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #e5e7eb;
-            color: #374151;
-            font-weight: 600;
-            font-size: 1.25rem;
-        }
-    }
+.avatarLoading {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
 
-    &__avatar-spinner {
-        position: absolute;
-        inset: 0;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 50%;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    &__file-input {
-        display: none;
-    }
+  &::after {
+    content: "";
+    width: 24px;
+    height: 24px;
+    border: 3px solid #ccc;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
 
-    &__meta {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-        flex: 1;
-    }
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-    h3 {
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6b7280;
-        margin-bottom: 0.25rem;
-    }
+.avatar {
+    object-fit: cover;
+}
 
-    &__text {
-        font-size: 0.875rem;
-        color: #111827;
-    }
+.textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    resize: vertical;
 
-    &__role {
-        display: inline-block;
-        padding: 0.25rem 0.625rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: #1f2937;
-        background-color: #e5e7eb;
-        border-radius: 9999px;
-        width: fit-content;
-    }
-
-    &--edit {
-        padding: 1.5rem;
-    }
-
-    &__edit-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-    }
-
-    &__textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 0.75rem;
-        font-size: 0.875rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.5rem;
-        resize: vertical;
-
-        &:focus {
-            outline: none;
-            border-color: #6366f1;
-        }
+    &:focus {
+        outline: none;
+        border-color: $color-primary;
     }
 }
 </style>
+
